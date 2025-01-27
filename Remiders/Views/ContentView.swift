@@ -10,52 +10,61 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-
+    @Query private var todos: [TodoItem] // Todo 항목들 리스트
+    @State private var newTodoTitle: String = "" // 새로운 Todo 항목
+    @State private var showCompleted: Bool = false // 완료된 항목 표시 여부
+    
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        NavigationStack {
+            VStack {
+                HStack {
+                    TextField("새로운 할일", text: $newTodoTitle)
+                    Button(action: addTodoItem) {
+                        Label("추가", systemImage: "plus.circle.fill")
                     }
                 }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                List {
+                    ForEach(todos) { todo in
+                        Text(todo.title)
                     }
                 }
+                
             }
-        } detail: {
-            Text("Select an item")
         }
     }
-
-    private func addItem() {
+    
+    private func addTodoItem() {
         withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
+            let newTodoItem = TodoItem(title: newTodoTitle, timestamp: Date())
+            modelContext.insert(newTodoItem)
+            newTodoTitle = ""
+            
+            // 저장 시도
+            do {
+                try modelContext.save()
+                print("아이템이 성공적으로 저장되었습니다: \(newTodoItem.title)")
+            } catch {
+                print("저장 실패: \(error)")
+            }
         }
     }
+    
+}
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
+
+struct TodoDetailView: View {
+    let todos: TodoItem
+    
+    var body: some View {
+        VStack {
+            Text("TodoDetailView")
         }
     }
 }
+    
+
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: TodoItem.self, inMemory: true)
 }
