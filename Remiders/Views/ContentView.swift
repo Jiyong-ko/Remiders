@@ -20,13 +20,16 @@ struct ContentView: View {
                 HStack {
                     TextField("새로운 할일", text: $newTodoTitle)
                     Button(action: addTodoItem) {
-                        Label("추가", systemImage: "plus.circle.fill")
+                        Label("완료", systemImage: "plus.circle.fill")
                     }
                 }
                 List {
                     ForEach(todos) { todo in
                         Text(todo.title)
                     }
+                    TextField("새로운 할일", text: $newTodoTitle)
+                    
+                    
                 }
                 
             }
