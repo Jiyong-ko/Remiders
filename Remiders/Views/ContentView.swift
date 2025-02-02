@@ -15,6 +15,7 @@ struct ContentView: View {
     @State private var showCompleted: Bool = false // 완료된 항목 표시 여부
     @State private var isShowingTextField: Bool = false // "새로운 할일" 텍스트필드 숨김 여부
     @FocusState private var isFocused: Bool // 텍스트필드에 포커스(커서) 주기
+    @State private var isNewTodoCompleted: Bool = false // "새로운 할일" 텍스트필드에 완료 토글 추가를 위한 새로운 변수
     
     var body: some View {
         NavigationStack {
@@ -30,16 +31,26 @@ struct ContentView: View {
                         TodoItemRowView(todo: todo)
                     }
                     if isShowingTextField {
-                        TextField("새로운 할일", text: $newTodoTitle)
+                        HStack {
+                            Button(action: {
+                                withAnimation {
+                                    // 새로운 Todo는 아직 생성되지 않았으므로 별도의 상태 변수가 필요
+                                    isNewTodoCompleted.toggle()
+                                }
+                            }) {
+                                Image(systemName: isNewTodoCompleted ? "checkmark.circle.fill" : "circle")
+                            }
+                            TextField("새로운 할일", text: $newTodoTitle)
                             // 포커스(커서) 주기
-                            .focused($isFocused)
-                            .onAppear {
-                                isFocused = true
-                            }
+                                .focused($isFocused)
+                                .onAppear {
+                                    isFocused = true
+                                }
                             // 엔터 버튼에 액션 호출
-                            .onSubmit {
-                                addTodoItem()
-                            }
+                                .onSubmit {
+                                    addTodoItem()
+                                }
+                        }
                     }
                     // 빈공간(개발 중에만 임시로 색깔 부여, 끝나면 opacity 0.0으로)
                     Rectangle()
@@ -71,14 +82,20 @@ struct ContentView: View {
         // 빈 문자열, 공백 처리
         guard !newTodoTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             isShowingTextField = false // "새로운 할일"텍스트필드 숨기기
+            isNewTodoCompleted = false // 텍스트필드 완료토글 초기화
             return
         }
         // addTodoItem 액션
         withAnimation {
-            let newTodoItem = TodoItem(title: newTodoTitle, timestamp: Date())
+            let newTodoItem = TodoItem(
+                title: newTodoTitle,
+                timestamp: Date(),
+                isCompleted: isNewTodoCompleted
+            )
             modelContext.insert(newTodoItem)
             newTodoTitle = ""
             isShowingTextField = false // "새로운 할일" 텍스트필드 숨기기
+            isNewTodoCompleted = false // 텍스트필드 완료토글 초기화
             
             // 저장 시도
             do {
