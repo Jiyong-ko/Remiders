@@ -68,6 +68,12 @@ struct ContentView: View {
     }
     
     private func addTodoItem() {
+        // 빈 문자열, 공백 처리
+        guard !newTodoTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            isShowingTextField = false // "새로운 할일"텍스트필드 숨기기
+            return
+        }
+        // addTodoItem 액션
         withAnimation {
             let newTodoItem = TodoItem(title: newTodoTitle, timestamp: Date())
             modelContext.insert(newTodoItem)
