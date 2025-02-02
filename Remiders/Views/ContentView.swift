@@ -13,7 +13,8 @@ struct ContentView: View {
     @Query private var todos: [TodoItem] // Todo 항목들 리스트
     @State private var newTodoTitle: String = "" // 새로운 Todo 항목
     @State private var showCompleted: Bool = false // 완료된 항목 표시 여부
-    @State private var isShowingTextField: Bool = false
+    @State private var isShowingTextField: Bool = false // "새로운 할일" 텍스트필드 숨김 여부
+    @FocusState private var isFocused: Bool // 텍스트필드에 포커스(커서) 주기
     
     var body: some View {
         NavigationStack {
@@ -30,10 +31,17 @@ struct ContentView: View {
                     }
                     if isShowingTextField {
                         TextField("새로운 할일", text: $newTodoTitle)
+                            // 포커스(커서) 주기
+                            .focused($isFocused)
+                            .onAppear {
+                                isFocused = true
+                            }
+                            // 엔터 버튼에 액션 호출
                             .onSubmit {
                                 addTodoItem()
                             }
                     }
+                    // 빈공간(개발 중에만 임시로 색깔 부여, 끝나면 opacity 0.0으로)
                     Rectangle()
                         .fill(Color.blue.opacity(0.2))
                         .frame(height: 700)
