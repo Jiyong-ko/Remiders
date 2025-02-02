@@ -35,6 +35,15 @@ struct ContentView: View {
                             }
                     }
                     Rectangle()
+                        .frame(height: 700)
+                        .onTapGesture {
+                            if isShowingTextField {
+                                addTodoItem()
+                            } else {
+                                isShowingTextField = true
+                            }
+                        }
+                    
                 }
                 .background(
                     Color.blue
