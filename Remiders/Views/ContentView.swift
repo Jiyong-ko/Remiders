@@ -27,7 +27,7 @@ struct ContentView: View {
                 }
                 List {
                     ForEach(todos) { todo in
-                        Text(todo.title)
+                        TodoItemRowView(todo: todo)
                     }
                     if isShowingTextField {
                         TextField("새로운 할일", text: $newTodoTitle)
@@ -88,7 +88,7 @@ struct ContentView: View {
 
 
 struct TodoDetailView: View {
-    let todos: TodoItem
+    let todos: TodoItem 
     
     var body: some View {
         VStack {
@@ -97,7 +97,25 @@ struct TodoDetailView: View {
     }
 }
     
-
+struct TodoItemRowView: View {
+    let todo: TodoItem  // todos -> todo로 변경
+    
+    var body: some View {
+        HStack {
+            Button(action: {
+                withAnimation {
+                    todo.isCompleted.toggle()
+                }
+            }) {
+                Image(systemName: todo.isCompleted ? "checkmark.circle.fill" : "circle")
+            }
+            VStack(alignment: .leading) {
+                Text(todo.title)
+                Text(todo.timestamp, format: .dateTime)
+            }
+        }
+    }
+}
 
 #Preview {
     ContentView()
