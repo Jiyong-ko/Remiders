@@ -35,6 +35,7 @@ struct ContentView: View {
                             }
                     }
                     Rectangle()
+                        .fill(Color.blue.opacity(0.2))
                         .frame(height: 700)
                         .onTapGesture {
                             if isShowingTextField {
