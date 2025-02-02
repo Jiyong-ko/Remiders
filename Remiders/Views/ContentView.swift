@@ -13,12 +13,13 @@ struct ContentView: View {
     @Query private var todos: [TodoItem] // Todo 항목들 리스트
     @State private var newTodoTitle: String = "" // 새로운 Todo 항목
     @State private var showCompleted: Bool = false // 완료된 항목 표시 여부
+    @State private var isShowingTextField: Bool = false
     
     var body: some View {
         NavigationStack {
             VStack {
                 HStack {
-                    TextField("새로운 할일", text: $newTodoTitle)
+                    Spacer()
                     Button(action: addTodoItem) {
                         Label("완료", systemImage: "plus.circle.fill")
                     }
@@ -27,9 +28,18 @@ struct ContentView: View {
                     ForEach(todos) { todo in
                         Text(todo.title)
                     }
-                    TextField("새로운 할일", text: $newTodoTitle)
-                    
-                    
+                    if isShowingTextField {
+                        TextField("새로운 할일", text: $newTodoTitle)
+                    }
+                    Rectangle()
+                }
+                .background(
+                    Color.blue
+                )
+                Button(action: {
+                    isShowingTextField = true // "새로운 할일" 텍스트필드 보이기
+                }) {
+                    Label("새로운 미리 알림", systemImage: "plus.circle.fill")
                 }
                 
             }
@@ -41,6 +51,7 @@ struct ContentView: View {
             let newTodoItem = TodoItem(title: newTodoTitle, timestamp: Date())
             modelContext.insert(newTodoItem)
             newTodoTitle = ""
+            isShowingTextField = false // "새로운 할일" 텍스트필드 숨기기
             
             // 저장 시도
             do {
