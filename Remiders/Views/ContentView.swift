@@ -30,6 +30,9 @@ struct ContentView: View {
                     }
                     if isShowingTextField {
                         TextField("새로운 할일", text: $newTodoTitle)
+                            .onSubmit {
+                                addTodoItem()
+                            }
                     }
                     Rectangle()
                 }
