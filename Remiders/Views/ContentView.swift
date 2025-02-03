@@ -18,66 +18,67 @@ struct ContentView: View {
     @State private var isNewTodoCompleted: Bool = false // "새로운 할일" 텍스트필드에 완료 토글 추가를 위한 새로운 변수
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                HStack {
-                    Spacer()
-                    Button(action: addTodoItem) {
-                        Label("완료", systemImage: "plus.circle.fill")
-                    }
+        
+        VStack {
+            HStack {
+                Spacer()
+                Button(action: addTodoItem) {
+                    Label("완료", systemImage: "plus.circle.fill")
                 }
-                List {
-                    ForEach(todos) { todo in
-                        TodoItemRowView(todo: todo)
-                    }
-                    .onDelete(perform: deleteTodoItems)
-                    if isShowingTextField {
-                        HStack {
-                            Button(action: {
-                                withAnimation {
-                                    // 새로운 Todo는 아직 생성되지 않았으므로 별도의 상태 변수가 필요
-                                    isNewTodoCompleted.toggle()
-                                }
-                            }) {
-                                Image(systemName: isNewTodoCompleted ? "checkmark.circle.fill" : "circle")
+            }
+            List {
+                ForEach(todos) { todo in
+                    TodoItemRowView(todo: todo)
+                }
+                .onDelete(perform: deleteTodoItems)
+                if isShowingTextField {
+                    HStack {
+                        Button(action: {
+                            withAnimation {
+                                // 새로운 Todo는 아직 생성되지 않았으므로 별도의 상태 변수가 필요
+                                isNewTodoCompleted.toggle()
                             }
-                            TextField("새로운 할일", text: $newTodoTitle)
-                            // 포커스(커서) 주기
-                                .focused($isFocused)
-                                .onAppear {
-                                    isFocused = true
-                                }
-                            // 엔터 버튼에 액션 호출
-                                .onSubmit {
-                                    addTodoItem()
-                                }
+                        }) {
+                            Image(systemName: isNewTodoCompleted ? "checkmark.circle.fill" : "circle")
                         }
-                    }
-                    // 빈공간(개발 중에만 임시로 색깔 부여, 끝나면 opacity 0.0으로)
-                    Rectangle()
-                        .fill(Color.blue.opacity(0.2))
-                        .frame(height: 700)
-                        .onTapGesture {
-                            if isShowingTextField {
+                        TextField("새로운 할일", text: $newTodoTitle)
+                        // 포커스(커서) 주기
+                            .focused($isFocused)
+                            .onAppear {
+                                isFocused = true
+                            }
+                        // 엔터 버튼에 액션 호출
+                            .onSubmit {
                                 addTodoItem()
-                            } else {
-                                isShowingTextField = true
                             }
+                    }
+                }
+                // 빈공간(개발 중에만 임시로 색깔 부여, 끝나면 opacity 0.0으로)
+                Rectangle()
+                    .fill(Color.blue.opacity(0.2))
+                    .frame(height: 700)
+                    .onTapGesture {
+                        if isShowingTextField {
+                            addTodoItem()
+                        } else {
+                            isShowingTextField = true
                         }
-                    
-                }
-                .background(
-                    Color.blue
-                )
-                Button(action: {
-                    isShowingTextField = true // "새로운 할일" 텍스트필드 보이기
-                }) {
-                    Label("새로운 미리 알림", systemImage: "plus.circle.fill")
-                }
+                    }
                 
             }
+            .background(
+                Color.blue
+            )
+            Button(action: {
+                isShowingTextField = true // "새로운 할일" 텍스트필드 보이기
+            }) {
+                Label("새로운 미리 알림", systemImage: "plus.circle.fill")
+            }
+            
         }
+        .navigationTitle("미리알림") // 타이틀 추가
     }
+    
     
     private func addTodoItem() {
         // 빈 문자열, 공백 처리
