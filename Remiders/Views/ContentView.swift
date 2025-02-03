@@ -30,6 +30,7 @@ struct ContentView: View {
                     ForEach(todos) { todo in
                         TodoItemRowView(todo: todo)
                     }
+                    .onDelete(perform: deleteTodoItems)
                     if isShowingTextField {
                         HStack {
                             Button(action: {
@@ -107,6 +108,15 @@ struct ContentView: View {
         }
     }
     
+    private func deleteTodoItems(offsets: IndexSet) {
+        withAnimation {
+            for index in offsets {
+                modelContext.delete(todos[index])
+                print("아이템이 삭제되었습니다.")
+            }
+        }
+    }
+    
 }
 
 
@@ -119,8 +129,10 @@ struct TodoDetailView: View {
         }
     }
 }
-    
+
+
 struct TodoItemRowView: View {
+    @Environment(\.modelContext) private var modelContext
     let todo: TodoItem  // todos -> todo로 변경
     
     var body: some View {
@@ -134,7 +146,10 @@ struct TodoItemRowView: View {
             }
             VStack(alignment: .leading) {
                 Text(todo.title)
+                    .strikethrough(todo.isCompleted) // 취소선 추가
                 Text(todo.timestamp, format: .dateTime)
+                    .font(.caption)
+                    .foregroundStyle(.gray)
             }
         }
     }
@@ -142,5 +157,5 @@ struct TodoItemRowView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: TodoItem.self, inMemory: true)
+        .modelContainer(for: TodoItem.self, inMemory: false)
 }
